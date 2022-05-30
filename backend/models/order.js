@@ -31,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     order_city: DataTypes.STRING,
   }, {
     sequelize,
+    underscored: true,
     modelName: 'Order',
   });
   return Order;

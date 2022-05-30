@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const bcrypt = require("bcrypt");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -11,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+    }
+    toJSON(){
+      return { ...this.get(), is_admin: undefined}
     }
   }
   User.init({
@@ -23,7 +27,13 @@ module.exports = (sequelize, DataTypes) => {
         isEmail: true,
       },
     },
-    password: DataTypes.STRING,
+    password: {
+      type: DataTypes.STRING,
+      set(value) {
+        const hash = bcrypt.hashSync(value, 10);
+        this.setDataValue('password', hash);
+      },
+    },
     phone: DataTypes.STRING,
     address: DataTypes.STRING,
     city: DataTypes.STRING,
@@ -33,6 +43,15 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {
     sequelize,
+    underscored: true,
+    instanceMethods: {
+      generateHash(password) {
+          return bcrypt.hash(password, bcrypt.genSaltSync(8));
+      },
+      validPassword(password) {
+          return bcrypt.compare(password, this.password);
+      }
+  },
     modelName: 'User',
   });
   return User;
