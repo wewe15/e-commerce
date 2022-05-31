@@ -42,9 +42,9 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      is_admin:{
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
+      role:{
+        type: Sequelize.ENUM('user', 'admin'),
+        defaultValue: 'user'
       },
       created_at: {
         allowNull: false,
