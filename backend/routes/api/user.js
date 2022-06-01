@@ -13,7 +13,7 @@ const hashPassword = (password) => {
 }
 
 
-router.get('/', authUser, async (req, res) => {
+router.get('/', authUser, async (_req, res) => {
     try {
         const users = await User.findAll({where: {role: 'user'}})
         res.json(users)
