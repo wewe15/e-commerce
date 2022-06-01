@@ -10,7 +10,7 @@ const address = "0.0.0.0:3001";
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json());
 app.use(cors())
-app.use('/uploads', express.static('../uploads'))
+app.use('/uploads', express.static('./uploads'))
 
 app.use(routes);
 
