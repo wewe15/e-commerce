@@ -5,7 +5,7 @@ const cors  = require('cors');
 const { sequelize } = require('./models');
 
 const app = express();
-const address = "0.0.0.0:3001";
+const port = process.env.PORT|| "3001";
 
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json());
@@ -14,8 +14,8 @@ app.use('/uploads', express.static('./uploads'))
 
 app.use(routes);
 
-app.listen(3001, async () => {
-    console.log(`starting app on: ${address}`);
+app.listen(port, async () => {
+    console.log(`starting app on: ${port}`);
     await sequelize.authenticate()
     console.log('Database is connected!!');
 });
