@@ -5,8 +5,11 @@ const { authAdmin } = require('../../middlewares/authentication');
 
 router.get('/', authAdmin, async (_req, res) => {
     try {
-        const categories = await Category.findAll()
-        res.json(categories)
+        const categories = await Category.findAll({include: 'products'})
+        if(!categories){
+            return res.json("Categories Not Found");
+        }
+        res.status(200).json(categories)
     }catch (err) {
         console.log(err)
         res.status(500).json({ error: 'Something went wrong' })
@@ -15,8 +18,11 @@ router.get('/', authAdmin, async (_req, res) => {
 
 router.get('/:id', authAdmin, async (req, res) => {
     try {
-        const categories = await Category.findByPk(req.params.id)
-        res.json(categories)
+        const category = await Category.findByPk(req.params.id)
+        if(!category){
+            return res.json("Category Not Found")
+        }
+        res.status(200).json(category)
     }catch (err) {
         console.log(err)
         res.status(500).json({ error: 'Something went wrong' })
@@ -29,7 +35,7 @@ router.post('/', authAdmin, async (req, res) => {
             name: req.body.name
         }
         const newCategory = await Category.create(category)
-        res.json(newCategory)
+        res.status(201).json(newCategory)
     }catch(err){
         console.log(err)
         res.status(500).json({ error: 'Something went wrong' })
@@ -41,9 +47,12 @@ router.put('/:id', authAdmin, async (req, res) => {
     try {
         const  name  = req.body.name
         const category = await Category.findByPk(req.params.id)
+        if(!category){
+            return res.json("Category Not Found")
+        }
         category.name = name
         await category.save()
-        res.json(category) 
+        res.status(200).json(category) 
     }catch(err){
         console.log(err)
         res.status(500).json({ error: 'Something went wrong' })
@@ -53,8 +62,11 @@ router.put('/:id', authAdmin, async (req, res) => {
 router.delete('/:id', authAdmin, async (req, res) => {
     try {
         const category = await Category.findByPk(req.params.id)
+        if(!category){
+            return res.json("Category Not Found")
+        }
         await category.destroy()
-        res.json({ message: 'category deleted!' })
+        res.status(200).json({ message: 'category deleted!' })
     }catch (err) {
         console.log(err)
         res.status(500).json({ error: 'Something went wrong' })

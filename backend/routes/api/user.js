@@ -5,31 +5,41 @@ const dotenv = require('dotenv');
 const { User } = require('../../models');
 const { authAdmin, authUser} = require('../../middlewares/authentication');
 
-dotenv.config()
+dotenv.config();
 
 const hashPassword = (password) => {
-    const salt_rounds = Number(process.env.SALT_ROUNDS)
+    const salt_rounds = Number(process.env.SALT_ROUNDS);
     return bcrypt.hashSync(password, salt_rounds);
 }
 
 
-router.get('/', authUser, async (_req, res) => {
+router.get('/', authAdmin, async (_req, res) => {
     try {
-        const users = await User.findAll({where: {role: 'user'}})
-        res.json(users)
+        const users = await User.findAll({
+            attributes: { exclude: ['password'] }
+        });
+        if(!users){
+            return res.json("Not found");
+        }
+        res.status(200).json(users);
     }catch (err) {
-        console.log(err)
-        res.status(500).json({ error: 'Something went wrong' })
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong' });
     }
 });
 
 router.get('/:id', authUser, async (req, res) => {
     try {
-        const user = await User.findByPk(req.params.id)
-        res.json(user)
+        const user = await User.findByPk(req.params.id, {
+            attributes: { exclude: ['password'] }
+        });
+        if(!user){
+            return res.json("Not found");
+        }
+        res.status(200).json(user);
     }catch (err) {
-        console.log(err)
-        res.status(500).json({ error: 'Something went wrong' })
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong' });
     }
 });
 
@@ -46,62 +56,75 @@ router.post('/', authAdmin, async (req, res) => {
             address: req.body.address,
             city: req.body.city,
         }
-        const newUser = await User.create(user)
-        res.json(newUser)
+        const newUser = await User.create(user);
+        res.status(201).json(newUser);
     }catch(err){
-        console.log(err)
-        res.status(500).json({ error: 'Something went wrong' })
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong' });
     }
 
 });
 
 router.put('/:id', authUser, async (req, res) => {
     try {
-        const {username, email, first_name, last_name, phone, address, city} = req.body
-        const user = await User.findByPk(req.params.id)
-        user.username = username
-        user.email = email
-        user.first_name = first_name
-        user.last_name = last_name
-        user.phone = phone
-        user.address = address
-        user.city = city
-        await user.save()
-        res.json(user) 
+        const {username, email, first_name, last_name, phone, address, city} = req.body;
+        const user = await User.findByPk(req.params.id);
+        if(!user){
+            return res.json("Not found");
+        }
+        user.username = username;
+        user.email = email;
+        user.first_name = first_name;
+        user.last_name = last_name;
+        user.phone = phone;
+        user.address = address;
+        user.city = city;
+        await user.save();
+        res.status(200).json(user) ;
     }catch(err){
-        console.log(err)
-        res.status(500).json({ error: 'Something went wrong' })
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong' });
     }
 });
 
 router.delete('/:id', authAdmin, async (req, res) => {
     try {
-        const user = await User.findByPk(req.params.id)
+        const user = await User.findByPk(req.params.id);
+        if(!user){
+            return res.json("Not found");
+        }
         await user.destroy()
-        res.json({ message: 'User deleted!' })
+        res.status(200).json({ message: 'User deleted!' });
     }catch (err) {
-        console.log(err)
-        res.status(500).json({ error: 'Something went wrong' })
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong' });
     }
 });
 
+// login & signup for users
 router.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({where: {username: req.body.username}});
         if (user){
             const isValid = await bcrypt.compareSync(req.body.password, user.password)
             if (isValid){
-                const token = await jwt.sign({id: user.id, role: user.role}, process.env.JWT_SECRET)
+                const token = await jwt.sign(
+                    {id: user.id, role: user.role},
+                    process.env.JWT_SECRET
+                )
                 return res.json({
                     access_token: token,
                     token_type: 'Bearer',
-                })
+                });
             }
         }
-        return res.status(401).json({status: 'error', message: 'the username or password do not match.'});
+        return res.status(401).json({
+            status: 'error',
+            message: 'the username or password do not match.'
+        });
     }catch(err){
         console.log(err)
-        res.status(500).json({ error: 'Something went wrong' })
+        res.status(500).json({ error: 'Something went wrong' });
     }
 
 });
@@ -118,11 +141,11 @@ router.post('/register', async (req, res) => {
             address: req.body.address,
             city: req.body.city,
         }
-        const newUser = await User.create(user)
-        res.json(newUser)
+        const newUser = await User.create(user);
+        res.status(201).json(newUser);
     }catch(err){
-        console.log(err)
-        res.status(500).json({ error: 'Something went wrong' })
+        console.log(err);
+        res.status(500).json({ error: 'Something went wrong' });
     }
 
 });

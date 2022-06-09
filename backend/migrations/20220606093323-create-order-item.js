@@ -1,44 +1,48 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('products', {
+    await queryInterface.createTable('order_items', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      category_id: {
+      name: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      user_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'categories',
-          key: 'id',
+          model: 'users',
+          key: 'id'
         }
       },
-      name: {
-        type: Sequelize.STRING,
+      order_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+        model: 'orders',
+        key: 'id'
+      }
       },
-      description: {
-        type: Sequelize.TEXT,
+      product_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+        model: 'products',
+        key: 'id'
+      }
       },
-      price: {
+      total_price: {
         type: Sequelize.DECIMAL,
-        allowNull: false,
+        allowNull: false
       },
       quantity: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      rating: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
-      },
-      num_reviews: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: false
       },
       created_at: {
         allowNull: false,
@@ -51,6 +55,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('products');
+    await queryInterface.dropTable('order_items');
   }
 };

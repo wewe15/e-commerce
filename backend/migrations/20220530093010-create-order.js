@@ -16,13 +16,21 @@ module.exports = {
           key: 'id',
         }
       },
-      status: {
+      is_paid: {
         type: Sequelize.BOOLEAN,
-        allowNull: false
+        allowNull: false,
+        defaultValue: false
       },
-      amount: {
-        type: Sequelize.INTEGER,
-        allowNull: false
+      paid_at: {
+        type: Sequelize.DATE
+      },
+      is_delivered: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
+      delivered_at: {
+        type: Sequelize.DATE
       },
       order_name: {
         type: Sequelize.STRING,
@@ -49,50 +57,8 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
-
-    await queryInterface.createTable('order_items', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      order_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'orders',
-          key: 'id',
-        }
-      },
-      prodcut_id: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        references: {
-          model: 'products',
-          key: 'id',
-        }
-      },
-      quantity: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      price: {
-        type: Sequelize.DECIMAL,
-        allowNull: false,
-      },
-      created_at: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updated_at: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
-    });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('order_items');
     await queryInterface.dropTable('orders');
   }
 };

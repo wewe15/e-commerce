@@ -9,8 +9,10 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    static associate(models) {
+    static associate({ User, Order_item }) {
       // define association here
+      this.belongsTo(User, {foreignKey: 'user_id', as: 'user'})
+      this.hasMany(Order_item, {foreignKey: 'order_id', as: 'orders'})
     }
   }
   Order.init({
@@ -21,14 +23,50 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id'
       }
     },
-    status: {
+    is_paid: {
       type: DataTypes.BOOLEAN,
-      defaultValue: false,
+      allowNull: false,
+      defaultValue: false
     },
-    order_name: DataTypes.STRING,
-    order_address: DataTypes.STRING,
-    order_phone: DataTypes.STRING,
-    order_city: DataTypes.STRING,
+    paid_at: {
+      type: DataTypes.DATE
+    },
+    is_delivered: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
+    delivered_at: {
+      type: DataTypes.DATE
+    },
+    order_name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
+    },
+    order_address: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
+    },
+    order_phone: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
+    },
+    order_city: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
+    },
   }, {
     sequelize,
     underscored: true,
