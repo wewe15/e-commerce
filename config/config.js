@@ -2,10 +2,10 @@ const dotenv = require("dotenv");
 dotenv.config();
 module.exports = {
   "development": {
-      "username": process.env.DB_USERNAME,
-      "password": process.env.DB_PASSWORD,
-      "database": process.env.DB_DATABASE,
-      "host": process.env.DB_HOST,
+      "username": "postgres",
+      "password": "postgres",
+      "database": "shop",
+      "host": "127.0.0.1",
       "dialect": "postgres",
       "logging": false,
       "dialectOptions": {
@@ -23,17 +23,13 @@ module.exports = {
       "dialect": "postgres"
   },
   "production": {
-      "username": process.env.DB_USERNAME,
-      "password": process.env.DB_PASSWORD,
-      "database": process.env.DB_DATABASE,
-      "host": process.env.DB_HOST,
-      "dialect": "postgres",
-      "logging": false,
-      "dialectOptions": {
-        "ssl": {
-          "require": true,
-          "rejectUnauthorized": false
-        }
-      }
-  }
+    "use_env_variable": "DATABASE_URL",
+    "dialect": "postgres",
+    "dialectOptions": {
+       "ssl": {
+         "require": true,
+         "rejectUnauthorized": false
+       }
+     }
+   }
 };
