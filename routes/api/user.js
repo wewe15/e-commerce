@@ -28,7 +28,7 @@ router.get('/', authAdmin, async (_req, res) => {
     }
 });
 
-router.get('/:id', authUser, async (req, res) => {
+router.get('/:id', authAdmin, async (req, res) => {
     try {
         const user = await User.findByPk(req.params.id, {
             attributes: { exclude: ['password'] }
@@ -65,10 +65,15 @@ router.post('/', authAdmin, async (req, res) => {
 
 });
 
-router.put('/:id', authUser, async (req, res) => {
+router.put('/mine', authUser, async (req, res) => {
     try {
         const {username, email, first_name, last_name, phone, address, city} = req.body;
-        const user = await User.findByPk(req.params.id);
+        let user = await User.findOne({
+            where: {
+                id: req.user.id
+            },
+            attributes: { exclude: ['password'] }
+        });
         if(!user){
             return res.json("Not found");
         }
@@ -79,7 +84,7 @@ router.put('/:id', authUser, async (req, res) => {
         user.phone = phone;
         user.address = address;
         user.city = city;
-        await user.save();
+        user = await user.save();
         res.status(200).json(user) ;
     }catch(err){
         console.log(err);

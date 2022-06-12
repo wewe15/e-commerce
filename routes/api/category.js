@@ -3,7 +3,7 @@ const { Category } = require('../../models');
 const { authAdmin } = require('../../middlewares/authentication');
 
 
-router.get('/', authAdmin, async (_req, res) => {
+router.get('/', async (_req, res) => {
     try {
         const categories = await Category.findAll({include: 'products'})
         if(!categories){
@@ -16,7 +16,7 @@ router.get('/', authAdmin, async (_req, res) => {
     }
 });
 
-router.get('/:id', authAdmin, async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const category = await Category.findByPk(req.params.id)
         if(!category){
