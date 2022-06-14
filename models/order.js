@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate({ User, Order_item }) {
       // define association here
       this.belongsTo(User, {foreignKey: 'user_id', as: 'user'})
-      this.hasMany(Order_item, {foreignKey: 'order_id', as: 'orders'})
+      this.hasMany(Order_item, {foreignKey: 'order_id', as: 'products'})
     }
   }
   Order.init({
