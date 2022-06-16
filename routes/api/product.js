@@ -116,9 +116,13 @@ router.put('/:id', authAdmin, async (req, res) => {
 router.delete('/:id', authAdmin, async (req, res) => {
     try {
         const product = await Product.findByPk(req.params.id);
+        const images = await Image.findAll({where:
+            {product_id: product.id},
+        })
         if(!product){
             return res.json("Product Not Found");
         };
+        await images.map(img => img.destroy())
         await product.destroy();
         res.status(200).json({ message: 'Product deleted!' });
     }catch (err) {
