@@ -122,7 +122,8 @@ router.post('/login', async (req, res) => {
                 return res.json({
                     token: token,
                     token_type: 'Bearer',
-                    role: user.role
+                    role: user.role,
+                    login: user.id
                 });
             }
         }
