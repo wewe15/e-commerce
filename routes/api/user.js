@@ -2,6 +2,7 @@ const router = require('express').Router();
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const { Op } = require("sequelize");
 const { User } = require('../../models');
 const { authAdmin, authUser} = require('../../middlewares/authentication');
 
@@ -43,7 +44,6 @@ router.get('/:id', authUser, async (req, res) => {
     }
 });
 
-// signup for admin
 router.post('/', authAdmin, async (req, res) => {
     try{
         const user = {
@@ -66,7 +66,6 @@ router.post('/', authAdmin, async (req, res) => {
 
 });
 
-// user update his information
 router.put('/mine', authUser, async (req, res) => {
     try {
         const {username, email, first_name, last_name, phone, address, city} = req.body;
@@ -108,7 +107,7 @@ router.delete('/:id', authAdmin, async (req, res) => {
     }
 });
 
-// login for both user & admin
+// login & signup for users
 router.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({where: {username: req.body.username}});
@@ -116,7 +115,7 @@ router.post('/login', async (req, res) => {
             const isValid = await bcrypt.compareSync(req.body.password, user.password)
             if (isValid){
                 const token = await jwt.sign(
-                    {id: user.id, role: user.role, email: user.email},
+                    {id: user.id, role: user.role},
                     process.env.JWT_SECRET
                 )
                 return res.json({
@@ -139,7 +138,6 @@ router.post('/login', async (req, res) => {
 
 });
 
-// signup for users
 router.post('/register', async (req, res) => {
     try{
         const user = {
@@ -152,8 +150,19 @@ router.post('/register', async (req, res) => {
             address: req.body.address,
             city: req.body.city,
         }
+        const userExist = await User.findOne({
+            where: {
+                [Op.or]: [
+                  { username: req.body.username },
+                  { email: req.body.email }
+                ]
+            }
+        })
+        if(userExist){
+            return res.status(409).json("This username or email already taken")
+        }
         const newUser = await User.create(user);
-        res.status(201).json(newUser);
+        return res.status(201).json(newUser);
     }catch(err){
         console.log(err);
         res.status(500).json({ error: 'Something went wrong' });
